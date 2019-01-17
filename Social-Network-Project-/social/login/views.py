@@ -1,8 +1,17 @@
-from django.shortcuts import render
-from django.contrib.auth import authenticate,login
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
 from django.http import HttpResponse
-from login.forms import SignUpForm
+from .forms import UserRegisterForm
+from django.views import generic
+from django.views.generic import View
 # Create your views here.
+
+
+@login_required
+def home(request):
+    return render(request, 'login/home.html')
 
 
 def check(request):
@@ -10,8 +19,8 @@ def check(request):
     password1 = request.POST['password1']
     user = authenticate(username=username1 , password=password1)
     if user is not None:
-        login(request, user)
-        return HttpResponse("<h1>you have successfully logged in </h1>")
+        auth_login(request, user)
+        return redirect('login:home')
     else:
         return render(request, 'login/index.html', {})
 
@@ -19,18 +28,71 @@ def check(request):
 def login(request):
     return render(request, 'login/index.html', {})
 
+"""
+def register(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            #messages.success(request, f'Account created for {username}!')
+            return redirect('home')
+    else:
+        form = UserRegisterForm()
+    return render(request, 'users/signup.html', {'form': form})
 
-def signupcheck(request):
-    form = SignUpForm(request.POST)
-    if form.is_valid():
-        form.save()
-        username = form.cleaned_data.get('username')
-        raw_password = form.cleaned_data.get('password')
-        user = authenticate(username=username, password=raw_password)
-        login(request, user)
-        return HttpResponse("<h1>you have successfully signed in</h1>")
+"""
+class UserFormView(View):
+    form_class = UserRegisterForm
+    template_name = 'login/signup.html'
 
-    return render(request, 'login/signup.html')
+    #display blank form
+    def get(self , request):
+        form  = self.form_class(None)
+        return render(request , self.template_name , {'form':form})
 
-def signup(request):
-    return render(request, 'login/signup.html',{})
+    # process form data
+    def post(self , request):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+
+            user = form.save(commit=False)
+
+            #cleaned (normalized) data
+            username = form.cleaned_data['username']
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
+            if password1!= password2:
+                return render(request , self.template_name , {'form':user})
+            user.set_password(password1)
+            user.save()
+
+            #return User objects if credentials are correct
+            user = authenticate(username = username , password = password1)
+
+            if user is not None:
+
+                if user.is_active:
+
+                    auth_login(request,user)
+                    return redirect('login:home')
+
+        return render(request , self.template_name , {'form':form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

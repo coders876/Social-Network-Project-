@@ -65,6 +65,7 @@ class UserFormView(View):
             password2 = form.cleaned_data['password2']
             if password1!= password2:
                 return render(request , self.template_name , {'form':user})
+
             user.set_password(password1)
             user.save()
 

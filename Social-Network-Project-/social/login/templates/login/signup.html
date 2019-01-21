@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<title>Login</title>
 	<meta charset="UTF-8">
@@ -33,7 +34,7 @@
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" method="post">
+				<form class="login100-form validate-form" method="post" ENCTYPE="multipart/form-data">
 					{% csrf_token %}
 					<span class="login100-form-title p-b-43">
 						Create an account
@@ -73,6 +74,17 @@
 						<input class="input100" type="password" name="password2">
 						<span class="focus-input100"></span>
 						<span class="label-input100">Re-enter Password</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate="Password is required">
+						<input class="input100" type="password" name="location">
+						<span class="focus-input100"></span>
+						<span class="label-input100">location</span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate="Password is required">
+						<strong><font size="5" color="black">&nbsp;&nbsp;&nbsp;&nbsp;Profile picture</font> </strong><br>
+						<input class="input100" type="file" name="profile_pic" >
+						<!--<span class="focus-input100"></span>
+						<span class="label-input100">choose the file</span>-->
 					</div>
 					<!--<div class="flex-sb-m w-full p-t-3 p-b-32">
 						<div class="contact100-form-checkbox">

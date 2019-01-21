@@ -6,12 +6,14 @@ from django.http import HttpResponse
 from .forms import UserRegisterForm
 from django.views import generic
 from django.views.generic import View
+from django.conf import settings
+from .models import Profile
 # Create your views here.
 
 
 @login_required
 def home(request):
-    return render(request, 'login/home.html')
+    return render(request, 'profile/index.html')
 
 
 def check(request):
@@ -65,8 +67,10 @@ class UserFormView(View):
             password2 = form.cleaned_data['password2']
             if password1!= password2:
                 return render(request , self.template_name , {'form':user})
-
             user.set_password(password1)
+            user.save()
+            user.profile.location = form.cleaned_data['location']
+            user.profile.profile_pic = request.FILES['profile_pic']
             user.save()
 
             #return User objects if credentials are correct
